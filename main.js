@@ -11,6 +11,8 @@ let tray;
 // var pathArquivos = './files/';
 // var nomeArquivoBanco = 'banco.txt';
 // var nomeArquivoNovos = 'numeros-novos-2-1.txt';
+var arquivoBanco;
+var arquivoNovos;
 var arquivoRepetidos;
 var success = false;
 
@@ -83,6 +85,7 @@ function processFiles(arg) {
     var contador = 0;
     dataNovos = fs.readFileSync(arg.pathNovos, { encoding: 'utf8' });
     console.log(`lendo arquivo ${arg.pathNovos} ...`)
+    arquivoNovos = arg.pathNovos;
   
     const rl = readLine.createInterface({
         input: fs.createReadStream(arg.pathBanco)
@@ -90,6 +93,7 @@ function processFiles(arg) {
   
     try {
         console.log(`lendo arquivo ${arg.pathBanco} ...`)
+        arquivoBanco = arg.pathBanco;
         rl.on("line", (line) => {
             if (dataNovos.includes(line)) {
                 contador++
@@ -134,12 +138,15 @@ function processFiles(arg) {
     }
   }
 
-// open notepad
-ipcMain.on('open-notepad', (event, arg) => {
-    child_process.spawn('C:\\windows\\notepad.exe')
+// open file
+ipcMain.on('open-banco', (event, arg) => {
+    child_process.exec(`start "" ${arquivoBanco}`)
 });
-
-// open folder
-ipcMain.on('open-file', (event, arg) => {
+// open file
+ipcMain.on('open-novos', (event, arg) => {
+    child_process.exec(`start "" ${arquivoNovos}`)
+});
+// open file
+ipcMain.on('open-repetidos', (event, arg) => {
     child_process.exec(`start "" ${arquivoRepetidos}`)
 });

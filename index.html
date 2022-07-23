@@ -11,7 +11,7 @@
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
     <script src="main.js"></script>
-    <title>Encontre repetidos App</title>
+    <title>Repetidos app</title>
 </head>
 
 <body>
@@ -39,9 +39,9 @@
             </div>
             <div id="botoes-file">
                 <input class="btn btn-primary" onclick="process_files();" value="Processar dados">
-                <input class="btn btn-danger" onclick="open_file();" type="button" value="Abrir Banco">
-                <input class="btn btn-danger" onclick="open_file();" type="button" value="Abrir Novos">
-                <input class="btn btn-danger" onclick="open_file();" type="button" value="Abrir Repetidos">
+                <input class="btn btn-outline-dark" onclick="open_banco();" type="button" value="Abrir Banco">
+                <input class="btn btn-outline-secondary" onclick="open_novos();" type="button" value="Abrir Novos">
+                <input class="btn btn-outline-success" onclick="open_repetidos();" type="button" value="Abrir Repetidos">
     
             </div>
         </div>
@@ -73,8 +73,14 @@
         })
     }
 
-    function open_file() {
-        ipcRenderer.send('open-file', {})
+    function open_banco() {
+        ipcRenderer.send('open-banco', {})
+    }
+    function open_novos() {
+        ipcRenderer.send('open-novos', {})
+    }
+    function open_repetidos() {
+        ipcRenderer.send('open-repetidos', {})
     }
 
 </script>
