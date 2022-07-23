@@ -3,6 +3,7 @@ const fs = require('fs');
 const os_util = require('node-os-utils');
 const os = require("os");
 const child_process = require("child_process");
+const readLine = require("readline");
 
 let mainWindow;
 let isQuiting;
@@ -93,6 +94,10 @@ ipcMain.on('get-cpu', (event, arg) => {
     setInterval(getcpuusage, 100)
 });
 
+ipcMain.on('execute-files', (event, arg) => {
+    processFiles()
+});
+
 function getcpuusage() {
     var cpu = os_util.cpu;
     cpu.usage()
@@ -102,6 +107,45 @@ function getcpuusage() {
             mainWindow.webContents.send('uptime', os.uptime());
         })
 }
+
+function processFiles() {
+    var contador = 0;
+    pathArquivos = './files/';
+    nomeArquivoBanco = 'banco.txt';
+    nomeArquivoNovos = 'numeros-novos-2-1.txt';
+    dataNovos = fs.readFileSync(pathArquivos + nomeArquivoNovos, { encoding: 'utf8' });
+    console.log(`lendo arquivo ${nomeArquivoNovos} ...`)
+  
+    const rl = readLine.createInterface({
+        input: fs.createReadStream('./files/banco.txt')
+    });
+  
+    try {
+        console.log(`lendo arquivo ${nomeArquivoBanco} ...`)
+        rl.on("line", (line) => {
+            if (dataNovos.includes(line)) {
+                contador++
+                console.log('Dado já existe no banco: ' + line);
+                fs.appendFile('./files/numeros-repetidos.txt', line + '\n', err => {
+                    if (err) throw err;
+                })
+            }
+        })
+  
+        rl.on("close", () => {
+            console.log("==============================================")
+            if (contador) {
+                console.log(`Encontrei ${contador} dados repetidos`)
+                console.log("O arquivo numeros-repetidos.txt está pronto")
+            } else {
+                console.log("Nenhum dado repetido encontrado")
+            }
+        })
+  
+    } catch (error) {
+        console.error(err);
+    }
+  }
 
 // open notepad
 ipcMain.on('open-notepad', (event, arg) => {
