@@ -1,48 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Repetidos App</title>
-    <script>window.$ = window.jQuery = require('jquery');</script>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"
-          integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap-theme.min.css"
-          integrity="sha384-jzngWsPS6op3fgRCDTESqrEJwRKck+CILhJVO5VvaAZCq8JYf8HsR/HPpBOOPZfR" crossorigin="anonymous">
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"
-            integrity="sha384-vhJnz1OVIdLktyixHY4Uk3OHEwdQqPppqYR8+5mjsauETgLOcEynD9oPHhhz18Nw"
-            crossorigin="anonymous"></script>
-    <script src="main.js"></script>
-</head>
-<body>
 
-<button type="submit" onclick="process_files();">Processar dados</button>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <script src="main.js"></script>
+    <title>Encontre repetidos App</title>
+</head>
+
+<body>
+    <h1 id="titulo">Localizador de dados repetidos</h1>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+        <div id="form">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Banco</span>
+                <input type="text" class="form-control" id="banco">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Dados novos</span>
+                <input type="text" class="form-control" id="novos">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Dados repetidos</span>
+                <input type="text" class="form-control" id="repetidos">
+            </div>
+            <div id="botoes-file">
+                <input class="btn btn-primary" onclick="process_files();" value="Processar dados">
+                <input class="btn btn-danger" onclick="open_file();" type="button" value="Abrir Banco">
+                <input class="btn btn-danger" onclick="open_file();" type="button" value="Abrir Novos">
+                <input class="btn btn-danger" onclick="open_file();" type="button" value="Abrir Repetidos">
+    
+            </div>
+        </div>
+
+        <!-- <div style="display:none" id="alert">
+            <div class="alert alert-info" role="alert" id="info">
+            </div>
+            <div class="alert alert-success" role="alert" id="message">
+            </div>
+        </div> -->
 
 </body>
-
 <script>
     const ipcRenderer = require('electron').ipcRenderer;
-    ipcRenderer.on('cpu', function (event, data) {
-        $('.cpu-progress').css('width', data + '%').attr('aria-valuenow', data).text(data + ' CPU');
-    });
-
-    ipcRenderer.on('uptime', function (event, data) {
-        var uptime = moment.utc(data*1000).format('HH:mm:ss');
-        document.getElementById("uptime_timer").innerHTML = uptime
-
+    ipcRenderer.on('finished', function (event, data) {
+        alert(
+            "Info: " + data.info + "\n" +
+            "message: " +  data.message)
     });
 
     function process_files() {
-        ipcRenderer.send('execute-files', {})
+        pathBanco = document.getElementById('banco').value.trim();
+        pathNovos = document.getElementById('novos').value.trim();
+        pathRepetidos = document.getElementById('repetidos').value.trim();
+        ipcRenderer.send('execute-files', {
+            pathBanco,
+            pathNovos,
+            pathRepetidos
+        })
     }
 
-    function open_folder() {
-        ipcRenderer.send('open-folder', {})
+    function open_file() {
+        ipcRenderer.send('open-file', {})
     }
 
 </script>
-
 
 </html>

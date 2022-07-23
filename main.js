@@ -8,6 +8,11 @@ const readLine = require("readline");
 let mainWindow;
 let isQuiting;
 let tray;
+// var pathArquivos = './files/';
+// var nomeArquivoBanco = 'banco.txt';
+// var nomeArquivoNovos = 'numeros-novos-2-1.txt';
+var arquivoRepetidos;
+var success = false;
 
 
 function createWindow() {
@@ -29,25 +34,6 @@ function createWindow() {
                 mainWindow.show()
             }
         },
-
-        {
-            label: 'Open Program Files', click: function () {
-                child_process.exec('start "" "C:\\Program Files"')
-            }
-        },
-
-        {
-            label: 'Open Temp Folder', click: function () {
-                child_process.exec('start ' + os.tmpdir());
-            }
-        },
-
-        {
-            label: 'Open NotePad', click: function () {
-                child_process.spawn('C:\\windows\\notepad.exe')
-            }
-        },
-
         {
             label: 'Quit', click: function () {
                 app.isQuiting = true;
@@ -78,55 +64,37 @@ function createWindow() {
 
 app.on('ready', createWindow);
 
-
 // Open Select file dialog
 ipcMain.on('select-file', (event, arg) => {
-    const path = (dialog.showOpenDialog({ properties: ['openFile', 'openDirectory', 'multiSelections'] }));
+    const path = (dialog.showOpenDialog({ properties: ['openFile', 'openDirectory'] }));
     fs.readdir(path[0], (err, files) =>{
-        files.forEach(file =>{
-            console.log(path[0]+ '\\' + file);
-        })
+        console.log(path[0]+ '\\' + file);
     })
 });
 
-// Get CPU Usage
-ipcMain.on('get-cpu', (event, arg) => {
-    setInterval(getcpuusage, 100)
-});
-
 ipcMain.on('execute-files', (event, arg) => {
-    processFiles()
+    console.log(arg)
+    if(arg){
+        processFiles(arg)
+    }
 });
 
-function getcpuusage() {
-    var cpu = os_util.cpu;
-    cpu.usage()
-        .then(info => {
-            mainWindow.webContents.send('cpu', info)
-            // send uptime to front end
-            mainWindow.webContents.send('uptime', os.uptime());
-        })
-}
-
-function processFiles() {
+function processFiles(arg) {
     var contador = 0;
-    pathArquivos = './files/';
-    nomeArquivoBanco = 'banco.txt';
-    nomeArquivoNovos = 'numeros-novos-2-1.txt';
-    dataNovos = fs.readFileSync(pathArquivos + nomeArquivoNovos, { encoding: 'utf8' });
-    console.log(`lendo arquivo ${nomeArquivoNovos} ...`)
+    dataNovos = fs.readFileSync(arg.pathNovos, { encoding: 'utf8' });
+    console.log(`lendo arquivo ${arg.pathNovos} ...`)
   
     const rl = readLine.createInterface({
-        input: fs.createReadStream('./files/banco.txt')
+        input: fs.createReadStream(arg.pathBanco)
     });
   
     try {
-        console.log(`lendo arquivo ${nomeArquivoBanco} ...`)
+        console.log(`lendo arquivo ${arg.pathBanco} ...`)
         rl.on("line", (line) => {
             if (dataNovos.includes(line)) {
                 contador++
                 console.log('Dado já existe no banco: ' + line);
-                fs.appendFile('./files/numeros-repetidos.txt', line + '\n', err => {
+                fs.appendFile(arg.pathRepetidos, line + '\n', err => {
                     if (err) throw err;
                 })
             }
@@ -135,15 +103,34 @@ function processFiles() {
         rl.on("close", () => {
             console.log("==============================================")
             if (contador) {
-                console.log(`Encontrei ${contador} dados repetidos`)
-                console.log("O arquivo numeros-repetidos.txt está pronto")
+                arquivoRepetidos = arg.pathRepetidos;
+                info = `Encontrei ${contador} dados repetidos`
+                message = `O arquivo ${arg.pathRepetidos} está pronto`
+                success = true
+                console.log(info)
+                console.log(message)
             } else {
-                console.log("Nenhum dado repetido encontrado")
+                info = "Nenhum dado repetido encontrado"
+                message = "Dados processados com sucesso"
+                console.log(info)
             }
+            mainWindow.webContents.send('finished', {
+                success,
+                info,
+                message
+            })
         })
   
     } catch (error) {
         console.error(err);
+        success = false
+        info = "Erro encontrado"
+        message = err
+        mainWindow.webContents.send('finished', {
+            success,
+            info,
+            message
+        })
     }
   }
 
@@ -153,6 +140,6 @@ ipcMain.on('open-notepad', (event, arg) => {
 });
 
 // open folder
-ipcMain.on('open-folder', (event, arg) => {
-    child_process.exec('start "" "C:\\Program Files"')
+ipcMain.on('open-file', (event, arg) => {
+    child_process.exec(`start "" ${arquivoRepetidos}`)
 });
