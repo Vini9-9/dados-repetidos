@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain, Tray, Menu} = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Tray, Menu, nativeImage} = require('electron');
 const fs = require('fs');
 const os_util = require('node-os-utils');
 const os = require("os");
@@ -22,14 +22,12 @@ function createWindow() {
         width: 500,
         height: 420,
         // maxWidth:1000,
-        icon:"icon.png",
-
     });
     mainWindow.loadFile('index.html');
     mainWindow.maximize();
 
     // create system tray
-    var appIcon = new Tray("icon.png");
+    var appIcon = new Tray(nativeImage.createEmpty());
     var contextMenu = Menu.buildFromTemplate([
         {
             label: 'Show App', click: function () {
@@ -98,7 +96,7 @@ function processFiles(arg) {
             if (dataNovos.includes(line)) {
                 contador++
                 console.log('Dado já existe no banco: ' + line);
-                fs.appendFile(arg.pathRepetidos, line + '\n', err => {
+                fs.appendFile(arg.pathRepetidos, line + '\r\n', err => {
                     if (err) throw err;
                 })
             }

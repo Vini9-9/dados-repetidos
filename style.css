@@ -44,3 +44,9 @@ html {
     justify-content: center;
     margin: 15px;
 }
+
+.footer-cta {
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+}

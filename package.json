@@ -5,17 +5,51 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "author": "Vinicius Pessoa da Silva",
   "license": "MIT",
   "dependencies": {
-    "electron": "^4.0.2",
+    "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.3.1",
     "node-os-utils": "^1.0.7",
     "systeminformation": "^3.54.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.64"
+    "@electron-forge/cli": "^6.0.0-beta.64",
+    "@electron-forge/maker-deb": "^6.0.0-beta.64",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.64",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.64",
+    "@electron-forge/maker-zip": "^6.0.0-beta.64",
+    "electron": "^4.2.12"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "repetidos_app"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }
